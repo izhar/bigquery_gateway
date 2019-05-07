@@ -1,0 +1,1 @@
+export GOOGLE_APPLICATION_CREDENTIALS=/Users/izhar/work/certs/promenade-222313-e3e0597b3b6a.json;iex -S mix

@@ -1,0 +1,61 @@
+defmodule BqWriterSupervisor do
+  use DynamicSupervisor
+  require Logger
+
+  defmodule State do
+    defstruct [
+      :status,
+      :rmq_qname,
+      :project_id,
+      :rmq_channel,
+      :rmq_payload,
+      :bigquery_sql,
+      :bigquery_conn,
+      :bigquery_token,
+      :bigquery_dataset,
+      :bigquery_table_name,
+      :bigquery_table_fields
+    ]
+  end
+
+  def start_link(arg) do
+    DynamicSupervisor.start_link(__MODULE__, arg, name: __MODULE__)
+  end
+
+  @impl true
+  def init(_arg) do
+    DynamicSupervisor.init(strategy: :one_for_one)
+  end
+
+	#def start_link do
+  #  Supervisor.start_link(__MODULE__, nil, name: __MODULE__)
+  #end
+
+  #def start_child(bq_writer) do
+  #  IO.puts "\nBqWriterSupervisor.start_child called with #{inspect bq_writer}\n"
+  #  start_child(__MODULE__, bq_writer)
+  #end
+
+  def init(_) do
+    children = [
+      worker(BqWriter, [])
+    ]
+
+    supervise(children, strategy: :simple_one_for_one)
+  end
+
+  def add_consumer() do
+    :ok
+  end
+
+  ## private #
+  ############
+  
+  defp to_atom str_or_atom do
+    case is_atom(str_or_atom) do
+      true  -> str_or_atom
+      false -> String.to_atom(str_or_atom)
+    end
+  end
+
+end
