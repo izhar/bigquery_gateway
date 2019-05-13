@@ -43,6 +43,10 @@ defmodule EsFetcher do
         IO.puts("### EsFetcher fetching more docs ###")
 
         case fetch_missing_demand(state.endpoint, state.scroll_id, missing_demand) do
+          {:error, reason} ->
+            IO.puts("Error while fetching docs from elasticsearch:\n#{inspect reason}\n terminating")
+            GenStage.async_info(self(), :stop)
+            {state.docs, state.scroll_id}
           {[], _scroll_id} ->
             IO.puts("EsFetcher reached end of docs")
             GenStage.async_info(self(), :stop)

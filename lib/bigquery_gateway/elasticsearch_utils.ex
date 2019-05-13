@@ -67,6 +67,10 @@ defmodule BigqueryGateway.ElasticsearchUtils do
     {[], scroll_id}
   end
 
+  defp package_state_for_consumer({:error, reason}) do
+    {:error, reason}
+  end
+
   @doc """
   Retrieve documents from a specific index
 
