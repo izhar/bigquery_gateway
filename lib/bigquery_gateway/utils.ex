@@ -1,5 +1,4 @@
 defmodule BigqueryGateway.Utils do
-
   @doc """
   Convert map string keys to :atom keys
   """
@@ -28,9 +27,8 @@ defmodule BigqueryGateway.Utils do
   end
 
   def schema_from_file(file_path) do
-    #File.read!("./priv/historical_schema.json") |> Poison.decode!()
-    file_path = "./priv/historical_schema.json"
-    File.read!(file_path) |> Poison.decode!()
+    File.read!(file_path)
+    |> Poison.decode!()
     |> atomize_keys()
   end
 

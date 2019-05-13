@@ -131,7 +131,14 @@ defmodule BqStreamer do
     case length(rows_to_stream) >= state.min_batch_size do
       true ->
         IO.puts("reached min batch size, streaming to bigquery")
-        # BigqueryGateway.stream_into_table(state.project, state.dataset, state.table, rows)
+
+        BigqueryGateway.stream_into_table(
+          state.project,
+          state.dataset,
+          state.table,
+          Poison.encode!(rows)
+        )
+
         IO.puts("done")
         {:noreply, [], %{state | rows: []}}
 
@@ -268,7 +275,7 @@ defmodule App do
   end
 end
 
-# Start the app and wait forever
+# Start the app and wait till the transfer is complete
 App.parse_options()
 |> App.validate_options()
 |> App.start()

@@ -74,3 +74,10 @@ curl -s -XPOST http://es-hist-test-01.totango:9200/_search/scroll -d '{"scroll":
 λ  curl -s -XPOST http://es-hist-test-01.totango:9200/_search/scroll -d '{"scroll": "1m", "scroll_id":"the-scroll-id-AbC12"}'
 {"error":{"root_cause":[{"type":"search_context_missing_exception","reason":"No search context found for id [51641]"}],"type":"search_phase_execution_exception","reason":"all shards failed","phase":"query","grouped":true,"failed_shards":[{"shard":-1,"index":null,"reason":{"type":"search_context_missing_exception","reason":"No search context found for id [51641]"}}],"caused_by":{"type":"search_context_missing_exception","reason":"No search context found for id [51641]"}},"status":404}%
 ```
+
+```bash  
+$ mix run ./lib/bigquery_gateway/create_bq_table.exs --project "promenade-222313" --dataset "integration_hub" --table "historical" --schema "./priv/historical_schema.json" --partition-on "date" --cluster-on "service_id"
+$
+$ mix run ./lib/bigquery_gateway/es_2bq_copier.exs --es-endpoint "http://es-hist-test-01.totango:9200" --es-index "880_2019_05_1_idx" --es-days-back 1 --bq-project "promenade-222313" --bq-dataset "integration_hub" --bq-table "historical" --es-scroll-size 2000 --bq-batch-size 500
+```  
+
