@@ -284,4 +284,27 @@ Resulting Elasticsearch call
 }
 ```  
 
+#### Bigquery  
 
+Number Attributes' date histogram  
+
+```sql
+SELECT
+  attribute_name, ARRAY_AGG(STRUCT(date, total)) AS distribution
+FROM (
+  SELECT
+    num_attr.key AS attribute_name, date,COUNT(*) AS total
+  FROM
+    `promenade-222313.integration_hub.historical3`,
+    UNNEST(number_attributes) AS num_attr
+  WHERE
+    service_id = '880'
+    and date(date) > '2019-05-01'
+  GROUP BY
+    num_attr.key,date)
+GROUP BY
+  attribute_name
+```  
+The result will look like  
+
+![](./images/number_attributes_historgram_result.png)

@@ -25,47 +25,50 @@ defmodule EsFetcher do
         {:producer, %{scroll_id: scroll_id, docs: docs, endpoint: endpoint}}
 
       {:complete, _scroll_id} ->
-        # GenStage.async_info(self(), {:producer, :done})
-        # {:producer, :done}
         {:stop, "No documents found in index #{index}, #{days_back} days back"}
 
       {:error, reason} ->
-        {:stop, "EsFetcher could not establish connection to elasticsearch"}
+        {:stop,
+         "EsFetcher could not establish connection to elasticsearchi, error: #{inspect(reason)}"}
     end
   end
 
   def handle_demand(demand, state) when demand > 0 do
-    {docs, scroll_id} =
+    {stop_or_not, docs, scroll_id} =
       if length(state.docs) >= demand do
-        {state.docs, state.scroll_id}
+        {:noreply, state.docs, state.scroll_id}
       else
         missing_demand = demand - length(state.docs)
-        IO.puts("### EsFetcher fetching more docs ###")
+        IO.puts(IO.ANSI.cyan <> ">> EsFetcher fetching more docs" <> IO.ANSI.white)
 
         case fetch_missing_demand(state.endpoint, state.scroll_id, missing_demand) do
           {:error, reason} ->
-            IO.puts("Error while fetching docs from elasticsearch:\n#{inspect reason}\n terminating")
+            IO.puts(
+              "Error while fetching docs from elasticsearch:\n#{inspect(reason)}\n terminating"
+            )
+
             GenStage.async_info(self(), :stop)
-            {state.docs, state.scroll_id}
+            {:noreply, state.docs, state.scroll_id}
+
           {[], _scroll_id} ->
-            IO.puts("EsFetcher reached end of docs")
+            IO.puts(IO.ANSI.cyan <> ">> EsFetcher reached end of docs" <> IO.ANSI.white)
             GenStage.async_info(self(), :stop)
-            {state.docs, state.scroll_id}
+            {:noreply, state.docs, state.scroll_id}
 
           {docs, scroll_id} ->
-            IO.puts("EsFetcher fetched #{length(docs)} docs")
-            {docs, scroll_id}
+            IO.puts(IO.ANSI.cyan <> ">> EsFetcher fetched #{length(docs)} docs" <> IO.ANSI.white)
+            {:noreply, docs, scroll_id}
         end
       end
 
     # We dispatch only the requested number of events.
     {to_dispatch, remaining} = Enum.split(docs, demand)
-    IO.puts("EsFetcher.handle_demand returning #{length(to_dispatch)} events")
-    {:noreply, to_dispatch, %{state | docs: remaining, scroll_id: scroll_id}}
+    #IO.puts("EsFetcher.handle_demand returning #{length(to_dispatch)} events")
+    {stop_or_not, to_dispatch, %{state | docs: remaining, scroll_id: scroll_id}}
   end
 
   def handle_info(:stop, state) do
-    IO.puts("EsFetcher.handle_inf called with :stop")
+    IO.puts("EsFetcher.handle_inf called with :stop, will terminate")
     {:stop, :normal, state}
   end
 
@@ -73,6 +76,9 @@ defmodule EsFetcher do
     case BigqueryGateway.ElasticsearchUtils.get_next_scroll(endpoint, scroll_id) do
       {[], scroll_id} ->
         {[], scroll_id}
+
+      {:error, reason} ->
+        {:error, reason}
 
       {docs, scroll_id} ->
         fetch_missing_demand(endpoint, scroll_id, missing_demand - length(docs), docs)
@@ -130,11 +136,10 @@ defmodule BqStreamer do
 
   def handle_events(rows, _from, state) do
     rows_to_stream = rows ++ state.rows
-    IO.puts("BqStreamer accumulated rows: #{length(rows_to_stream)}")
 
     case length(rows_to_stream) >= state.min_batch_size do
       true ->
-        IO.puts("reached min batch size, streaming to bigquery")
+        IO.puts(IO.ANSI.green <> "<< BqStreamer streaming #{length(rows_to_stream)} rows to bigquery" <> IO.ANSI.white)
 
         BigqueryGateway.stream_into_table(
           state.project,
@@ -143,49 +148,41 @@ defmodule BqStreamer do
           Poison.encode!(rows)
         )
 
-        IO.puts("done")
+        IO.puts(IO.ANSI.green <> "<< done" <> IO.ANSI.white)
         {:noreply, [], %{state | rows: []}}
 
       false ->
-        IO.puts("batch size too small, accumulating for next round")
+        IO.puts("BqStreamer accumulating, #{length(rows_to_stream)} rows")
         {:noreply, [], %{state | rows: rows_to_stream}}
+    end
+  end
+
+  def handle_cancel({cancellation_reason, _}, _from, state) do
+    case length(state.rows) > 0 do
+      true ->
+        IO.puts("streaming remaining #{length(state.rows)} docs to bigquery")
+
+        BigqueryGateway.stream_into_table(
+          state.project,
+          state.dataset,
+          state.table,
+          Poison.encode!(state.rows)
+        )
+
+        IO.puts("done")
+        #{:stop, "BqStreamer terminating", %{state | rows: []}}
+        System.stop(0)
+        {:stop, :shutdown,[]}
+
+      false ->
+        IO.puts("handle_cancel, reason: #{inspect(cancellation_reason)}")
+        {:stop, "BqStreamer terminating", state}
     end
   end
 
   def handle_info(message, state) do
     IO.puts("\nBqStreame.handle_info called with #{inspect(message)}\n")
     {:stop, :normal, state}
-  end
-end
-
-defmodule Consumer do
-  @moduledoc """
-  A consumer will be a consumer supervisor that will
-  spawn printer tasks for each event.
-  """
-
-  use ConsumerSupervisor
-
-  def start_link() do
-    ConsumerSupervisor.start_link(__MODULE__, :ok)
-  end
-
-  # Callbacks
-
-  def init(:ok) do
-    children = [
-      worker(Printer, [], restart: :temporary)
-    ]
-
-    {:ok, children, strategy: :one_for_one, subscribe_to: [{EsFetcher, max_demand: 50}]}
-  end
-end
-
-defmodule Printer do
-  def start_link(event) do
-    Task.start_link(fn ->
-      IO.inspect({self(), event})
-    end)
   end
 end
 
@@ -214,15 +211,20 @@ defmodule App do
     min_batch_size = Keyword.get(options, :bq_batch_size, 1000)
 
     children = [
-      worker(EsFetcher, [
-        %{endpoint: endpoint, index: index, days_back: days_back, scroll_size: scroll_size}
-      ]),
-      # We can add as many consumer supervisors as consumers as we want!
-      # worker(Consumer, [], id: 1)
-      # worker(BqStreamer, [], id: 1)
-      worker(BqStreamer, [
-        %{project: project, dataset: dataset, table: table, min_batch_size: min_batch_size}
-      ])
+      worker(
+        EsFetcher,
+        [
+          %{endpoint: endpoint, index: index, days_back: days_back, scroll_size: scroll_size}
+        ],
+        restart: :temporary
+      ),
+      worker(
+        BqStreamer,
+        [
+          %{project: project, dataset: dataset, table: table, min_batch_size: min_batch_size}
+        ],
+        restart: :temporary
+      )
     ]
 
     Supervisor.start_link(children, strategy: :one_for_one)

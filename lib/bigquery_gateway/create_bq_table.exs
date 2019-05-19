@@ -9,11 +9,16 @@ defmodule BqTable do
       dataset = Keyword.get(options, :dataset)
       table = Keyword.get(options, :table)
       schema = BigqueryGateway.Utils.schema_from_file(schema_path)
-      partition_on  = Keyword.get(options, :partition_on, nil)
-      cluster_on  = Keyword.get(options, :cluster_on, nil)
-      IO.puts "creating table #{table} in #{project}.#{dataset}"
-      BigqueryGateway.create_table(project, dataset, table, schema,[partition_on: partition_on, cluster_on: cluster_on])
-      IO.puts "done."
+      partition_on = Keyword.get(options, :partition_on, nil)
+      cluster_on = Keyword.get(options, :cluster_on, nil)
+      IO.puts("creating table #{table} in #{project}.#{dataset}")
+
+      BigqueryGateway.create_table(project, dataset, table, schema,
+        partition_on: partition_on,
+        cluster_on: cluster_on
+      )
+
+      IO.puts("done.")
     end
 
     def parse_options() do

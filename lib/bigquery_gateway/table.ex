@@ -90,7 +90,7 @@ defmodule BigqueryGateway.Table do
   end
 
   defp process_stream_insert({:error, reason}) do
-    IO.puts("iinsert failed with reason: #{inspect(reason)}")
+    IO.puts(IO.ANSI.red <> "iinsert failed with reason: #{inspect(reason)}" <> IO.ANSI.white)
     {:error, reason}
   end
 
@@ -98,7 +98,7 @@ defmodule BigqueryGateway.Table do
          {:ok,
           %GoogleApi.BigQuery.V2.Model.TableDataInsertAllResponse{insertErrors: nil, kind: _kind}}
        ) do
-    IO.puts("completed with no errors")
+    #IO.puts("completed with no errors")
     :ok
   end
 

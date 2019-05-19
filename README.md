@@ -48,6 +48,59 @@ $ curl http://es-hist-test-01.totango:9200/160_2019_02_1_idx/_mappings | json_pp
 $ curl -XPOST http://es-hist-test-01.totango:9200/160_2019_02_1_idx/_search\?size\=5 > ./5_rows.json
 ```
 
+#### Determining the bigquery schema from the elasticsearch mapping 
+
+Lets's use the "products" obbject as an example  
+
+products' elasticsearch mapping  
+
+```javascript
+"products" : {
+  "properties" : {
+     "all" : {
+        "type" : "keyword"
+     },
+     "direct" : {
+        "type" : "keyword"
+     }
+  }
+}
+```  
+
+So in elasticsearch, any field can contain zero or more values (of the same type), so let's look at the data  
+Get some sample data with "documents" field, to see its data structure  
+```bash
+$ curl -s http://es-hist-test-01.totango:9200/248_2019_05_1_idx/_search -d '{"query":{"query_string":{"fields":["products"],"query":"*"}}}'
+```  
+
+Extacting out the products object  
+
+```javascript
+"products":{"all":["Transportation","Marketing"],"direct":["Transportation","Marketing"]}
+```  
+
+so it's an array..  
+
+The bigquery schema will be  
+
+```javascript  
+{
+	"type": "record",
+	"name": "products",
+	"mode": "nullable",
+	"fields": [{
+		"type": "string",
+		"name": "all",
+		"mode": "repeated"
+	}, {
+		"type": "string",
+		"name": "direct",
+		"mode": "repeated"
+	}]
+}
+```  
+
+
 Grafana  
 
 Historical production cluster  
