@@ -308,3 +308,12 @@ GROUP BY
 The result will look like  
 
 ![](./images/number_attributes_historgram_result.png)
+
+Health  
+
+```sql
+select date, health_data.health as health, count(*) as accounts,sum(contract_value) as contract_val  FROM `promenade-222313.integration_hub.historical3` where service_id = '230' and health_data.health is not null and date(date) > '2019-05-07' group by date,  health order by date desc, health desc LIMIT 10
+```  
+
+![](./images/health.png)
+
