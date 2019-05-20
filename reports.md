@@ -284,9 +284,9 @@ Resulting Elasticsearch call
 }
 ```  
 
-#### Bigquery  
+#### Bigquery example reporting queries  
 
-Number Attributes' date histogram  
+***Number Attributes' date histogram***  
 
 ```sql
 SELECT
