@@ -356,8 +356,29 @@ ORDER BY
   accounts DESC
   ```  
 
-![](./images/account_activity.png)  
+![](./images/account_aggregation.png)  
 
-#### Module activity  
+#### Module aggregations  
 
+```sql
+SELECT
+  t.date,
+  module.name AS module_name,
+  COUNT(*) AS accounts,
+  SUM(module.value14) AS activities
+FROM
+  `promenade-222313.integration_hub.historical3` AS t,
+  UNNEST(module_aggregations) AS module
+WHERE
+  service_id = '880'
+  AND module.name IS NOT NULL
+  AND module.value14 >= 10
+GROUP BY
+  t.date,
+  module_name
+ORDER BY
+  t.date DESC,
+  accounts DESC
+  ```  
 
+![](./images/module_aggregation.png)  
