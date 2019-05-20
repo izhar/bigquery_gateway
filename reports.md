@@ -286,7 +286,7 @@ Resulting Elasticsearch call
 
 ### Bigquery example reporting queries  
 
-#### Number Attributes' date histogram  
+#### Number-Attributes' date histogram  
 
 ```sql
 SELECT
@@ -312,7 +312,20 @@ The result will look like
 #### Health  
 
 ```sql
-select date, health_data.health as health, count(*) as accounts,sum(contract_value) as contract_val  FROM `promenade-222313.integration_hub.historical3` where service_id = '230' and health_data.health is not null and date(date) > '2019-05-07' group by date,  health order by date desc, health desc LIMIT 10
+SELECT
+  date,
+  health_data.health AS health,
+  COUNT(*) AS accounts,
+  SUM(contract_value) AS contract_val
+FROM
+  `promenade-222313.integration_hub.historical3`
+WHERE
+  service_id = '230'
+  AND health_data.health IS NOT NULL
+  AND DATE(date) > '2019-05-07'
+GROUP BY
+  date,
+  health
 ```  
 
 ![](./images/health.png)
