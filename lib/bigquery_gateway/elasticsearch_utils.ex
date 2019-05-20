@@ -192,7 +192,7 @@ defmodule BigqueryGateway.ElasticsearchUtils do
             "took" => _took
           }}
        ) do
-    #IO.puts("\nReceived #{Enum.count(hits)} hits\n")
+    # IO.puts("\nReceived #{Enum.count(hits)} hits\n")
     {:ok, %{scroll_id: scroll_id, hits: hits}}
   end
 

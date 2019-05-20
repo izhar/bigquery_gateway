@@ -39,7 +39,7 @@ defmodule EsFetcher do
         {:noreply, state.docs, state.scroll_id}
       else
         missing_demand = demand - length(state.docs)
-        IO.puts(IO.ANSI.cyan <> ">> EsFetcher fetching more docs" <> IO.ANSI.white)
+        IO.puts(IO.ANSI.cyan() <> ">> EsFetcher fetching more docs" <> IO.ANSI.white())
 
         case fetch_missing_demand(state.endpoint, state.scroll_id, missing_demand) do
           {:error, reason} ->
@@ -51,19 +51,22 @@ defmodule EsFetcher do
             {:noreply, state.docs, state.scroll_id}
 
           {[], _scroll_id} ->
-            IO.puts(IO.ANSI.cyan <> ">> EsFetcher reached end of docs" <> IO.ANSI.white)
+            IO.puts(IO.ANSI.cyan() <> ">> EsFetcher reached end of docs" <> IO.ANSI.white())
             GenStage.async_info(self(), :stop)
             {:noreply, state.docs, state.scroll_id}
 
           {docs, scroll_id} ->
-            IO.puts(IO.ANSI.cyan <> ">> EsFetcher fetched #{length(docs)} docs" <> IO.ANSI.white)
+            IO.puts(
+              IO.ANSI.cyan() <> ">> EsFetcher fetched #{length(docs)} docs" <> IO.ANSI.white()
+            )
+
             {:noreply, docs, scroll_id}
         end
       end
 
     # We dispatch only the requested number of events.
     {to_dispatch, remaining} = Enum.split(docs, demand)
-    #IO.puts("EsFetcher.handle_demand returning #{length(to_dispatch)} events")
+    # IO.puts("EsFetcher.handle_demand returning #{length(to_dispatch)} events")
     {stop_or_not, to_dispatch, %{state | docs: remaining, scroll_id: scroll_id}}
   end
 
@@ -139,7 +142,11 @@ defmodule BqStreamer do
 
     case length(rows_to_stream) >= state.min_batch_size do
       true ->
-        IO.puts(IO.ANSI.green <> "<< BqStreamer streaming #{length(rows_to_stream)} rows to bigquery" <> IO.ANSI.white)
+        IO.puts(
+          IO.ANSI.green() <>
+            "<< BqStreamer streaming #{length(rows_to_stream)} rows to bigquery" <>
+            IO.ANSI.white()
+        )
 
         BigqueryGateway.stream_into_table(
           state.project,
@@ -148,7 +155,7 @@ defmodule BqStreamer do
           Poison.encode!(rows)
         )
 
-        IO.puts(IO.ANSI.green <> "<< done" <> IO.ANSI.white)
+        IO.puts(IO.ANSI.green() <> "<< done" <> IO.ANSI.white())
         {:noreply, [], %{state | rows: []}}
 
       false ->
@@ -170,9 +177,9 @@ defmodule BqStreamer do
         )
 
         IO.puts("done")
-        #{:stop, "BqStreamer terminating", %{state | rows: []}}
+        # {:stop, "BqStreamer terminating", %{state | rows: []}}
         System.stop(0)
-        {:stop, :shutdown,[]}
+        {:stop, :shutdown, []}
 
       false ->
         IO.puts("handle_cancel, reason: #{inspect(cancellation_reason)}")
