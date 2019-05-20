@@ -290,7 +290,8 @@ Resulting Elasticsearch call
 
 ```sql
 SELECT
-  attribute_name, ARRAY_AGG(STRUCT(date, total)) AS distribution
+  attribute_name, 
+  ARRAY_AGG(STRUCT(date, total)) AS distribution
 FROM (
   SELECT
     num_attr.key AS attribute_name, date,COUNT(*) AS total
