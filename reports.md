@@ -331,3 +331,33 @@ GROUP BY
 
 ![](./images/health.png)
 
+#### Activity aggregations  
+
+Accounts which were active more than 10 times in the last 14 days  
+
+```sql
+SELECT
+  t.date,
+  COUNT(*) AS accounts,
+  activity.name,
+  SUM(activity.value14) AS activities
+FROM
+  `promenade-222313.integration_hub.historical3` AS t,
+  UNNEST(activity_aggregations) AS activity
+WHERE
+  service_id = '880'
+  AND activity.name IS NOT NULL
+  AND activity.value14 >= 10
+GROUP BY
+  t.date,
+  activity.name
+ORDER BY
+  date DESC,
+  accounts DESC
+  ```  
+
+![](./images/account_activity.png)  
+
+#### Module activity  
+
+
