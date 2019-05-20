@@ -307,7 +307,7 @@ GROUP BY
 
 ![](./images/health.png)
 
-#### Activity aggregations  
+#### Activity aggregation  
 
 Accounts which were active more than 10 times in the last 14 days  
 
@@ -334,7 +334,7 @@ ORDER BY
 
 ![](./images/account_aggregation.png)  
 
-#### Module aggregations  
+#### Module aggregation  
 
 ```sql
 SELECT
