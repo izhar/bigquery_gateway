@@ -383,3 +383,231 @@ The result will look like
 
 ![](./images/number_attributes_historgram_result.png)
 
+and in json format:  
+
+```javascript
+[
+  {
+    "attribute_name": "beni attr 2",
+    "distribution": [
+      {
+        "date": "2019-05-08 00:00:00 UTC",
+        "total": "231"
+      },
+      {
+        "date": "2019-05-05 00:00:00 UTC",
+        "total": "90"
+      },
+      {
+        "date": "2019-05-06 00:00:00 UTC",
+        "total": "100"
+      },
+      {
+        "date": "2019-05-04 00:00:00 UTC",
+        "total": "95"
+      },
+      {
+        "date": "2019-05-07 00:00:00 UTC",
+        "total": "92"
+      }
+    ]
+  },
+  {
+    "attribute_name": "Number of touchpoints created in the last 7 days",
+    "distribution": [
+      {
+        "date": "2019-05-08 00:00:00 UTC",
+        "total": "12"
+      },
+      {
+        "date": "2019-05-04 00:00:00 UTC",
+        "total": "42"
+      },
+      {
+        "date": "2019-05-07 00:00:00 UTC",
+        "total": "42"
+      },
+      {
+        "date": "2019-05-05 00:00:00 UTC",
+        "total": "33"
+      },
+      {
+        "date": "2019-05-06 00:00:00 UTC",
+        "total": "35"
+      }
+    ]
+  },
+  {
+    "attribute_name": "Number of test19 tasks completed in the last 1 day",
+    "distribution": [
+      {
+        "date": "2019-05-05 00:00:00 UTC",
+        "total": "2"
+      },
+      {
+        "date": "2019-05-07 00:00:00 UTC",
+        "total": "5"
+      },
+      {
+        "date": "2019-05-08 00:00:00 UTC",
+        "total": "2"
+      },
+      {
+        "date": "2019-05-04 00:00:00 UTC",
+        "total": "1"
+      },
+      {
+        "date": "2019-05-06 00:00:00 UTC",
+        "total": "3"
+      }
+    ]
+  },
+  {
+    "attribute_name": "att1",
+    "distribution": [
+      {
+        "date": "2019-05-04 00:00:00 UTC",
+        "total": "5"
+      },
+      {
+        "date": "2019-05-05 00:00:00 UTC",
+        "total": "2"
+      },
+      {
+        "date": "2019-05-07 00:00:00 UTC",
+        "total": "3"
+      },
+      {
+        "date": "2019-05-06 00:00:00 UTC",
+        "total": "4"
+      }
+    ]
+  },
+  {
+    "attribute_name": "Number of mavicpro tasks overdue in the last 30 days",
+    "distribution": [
+      {
+        "date": "2019-05-07 00:00:00 UTC",
+        "total": "5"
+      },
+      {
+        "date": "2019-05-05 00:00:00 UTC",
+        "total": "3"
+      },
+      {
+        "date": "2019-05-06 00:00:00 UTC",
+        "total": "3"
+      },
+      {
+        "date": "2019-05-04 00:00:00 UTC",
+        "total": "2"
+      }
+    ]
+  },
+  {
+    "attribute_name": "Number of Renewal tasks completed in the last 1 day",
+    "distribution": [
+      {
+        "date": "2019-05-07 00:00:00 UTC",
+        "total": "1"
+      },
+      {
+        "date": "2019-05-04 00:00:00 UTC",
+        "total": "2"
+      },
+      {
+        "date": "2019-05-06 00:00:00 UTC",
+        "total": "1"
+      }
+    ]
+  },
+  {
+    "attribute_name": "Number of Billing tasks overdue in the last 7 days",
+    "distribution": [
+      {
+        "date": "2019-05-05 00:00:00 UTC",
+        "total": "1"
+      },
+      {
+        "date": "2019-05-04 00:00:00 UTC",
+        "total": "2"
+      },
+      {
+        "date": "2019-05-07 00:00:00 UTC",
+        "total": "1"
+      },
+      {
+        "date": "2019-05-06 00:00:00 UTC",
+        "total": "1"
+      }
+    ]
+  },
+  {
+    "attribute_name": "Number of Onboarding tasks overdue",
+    "distribution": [
+      {
+        "date": "2019-05-06 00:00:00 UTC",
+        "total": "5616"
+      },
+      {
+        "date": "2019-05-04 00:00:00 UTC",
+        "total": "6346"
+      },
+      {
+        "date": "2019-05-07 00:00:00 UTC",
+        "total": "5721"
+      },
+      {
+        "date": "2019-05-05 00:00:00 UTC",
+        "total": "5601"
+      },
+      {
+        "date": "2019-05-08 00:00:00 UTC",
+        "total": "1910"
+      }
+    ]
+  },
+  {
+    "attribute_name": "Number of open tasks in next 7 days",
+    "distribution": [
+      {
+        "date": "2019-05-04 00:00:00 UTC",
+        "total": "6347"
+      },
+      {
+        "date": "2019-05-08 00:00:00 UTC",
+        "total": "2106"
+      },
+      {
+        "date": "2019-05-06 00:00:00 UTC",
+        "total": "5619"
+      },
+      {
+        "date": "2019-05-05 00:00:00 UTC",
+        "total": "5603"
+      },
+      {
+        "date": "2019-05-07 00:00:00 UTC",
+        "total": "5724"
+      }
+    ]
+  },
+  {
+    "attribute_name": "Number of Test4 tasks overdue in the last 14 days",
+    "distribution": [
+      {
+        "date": "2019-05-06 00:00:00 UTC",
+        "total": "1"
+      },
+      {
+        "date": "2019-05-05 00:00:00 UTC",
+        "total": "1"
+      },
+      {
+        "date": "2019-05-07 00:00:00 UTC",
+        "total": "2"
+      }
+    ]
+  }
+]
+```
